@@ -1,0 +1,1 @@
+In Route 53, the Geolocation routing policy allows us to direct users to specific versions of a website based on their location. For example, users from Germany can see the German version of www.google.com, users from France can see the French version, and users from other locations can be directed to a default version of the website.
