@@ -1,0 +1,60 @@
+What is S3 Lifecycle?
+Amazon S3 Lifecycle policies automate transitioning and expiring objects to optimize storage costs by defining rules for managing object lifecycles.
+
+Key Features
+Transition Actions: Move objects between storage classes based on access patterns and cost.
+
+Common transitions:
+Standard → Standard-IA → Glacier/Deep Archive.
+Example: Move objects older than 30 days to Glacier.
+Expiration Actions: Permanently delete objects after a specific period.
+
+Example: Delete objects older than 365 days.
+Versioning Support: Apply lifecycle rules to both current and previous versions of objects in versioned buckets.
+
+Multipart Upload Cleanup: Automatically delete incomplete multipart uploads after a specified number of days.
+
+S3 Storage Classes in Lifecycle
+S3 Standard: Frequent access; higher cost.
+S3 Intelligent-Tiering: Automatically adjusts tiers based on access.
+S3 Standard-IA (Infrequent Access): Lower cost; higher retrieval fees.
+S3 One Zone-IA: Infrequent access; data stored in one zone.
+S3 Glacier: Long-term archive; slower access.
+S3 Glacier Deep Archive: Lowest cost; retrieval within hours.
+Components of Lifecycle Policy
+Rules:
+A policy can have multiple rules for different object prefixes or tags.
+Conditions:
+Specify when actions occur, based on:
+Object age: Days after creation.
+Tags: Specific tags for filtering objects.
+Actions:
+Transition: Move to a different storage class.
+Expiration: Delete objects.
+Abort Incomplete Multipart Uploads.
+Example Lifecycle Rule
+json
+Copy code
+{
+  "Rules": [
+    {
+      "ID": "TransitionToIAAndGlacier",
+      "Filter": { "Prefix": "logs/" },
+      "Status": "Enabled",
+      "Transitions": [
+        { "Days": 30, "StorageClass": "STANDARD_IA" },
+        { "Days": 365, "StorageClass": "GLACIER" }
+      ],
+      "Expiration": { "Days": 730 }
+    }
+  ]
+}
+Explanation:
+
+Move objects in the logs/ prefix to Standard-IA after 30 days.
+Move to Glacier after 365 days.
+Expire after 730 days.
+Benefits
+Reduces storage costs.
+Automates data management.
+Ensures compliance with retention policies.
