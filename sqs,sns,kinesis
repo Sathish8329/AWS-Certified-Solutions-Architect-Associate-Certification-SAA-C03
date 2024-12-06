@@ -1,0 +1,61 @@
+Integration of Applications Using SQS, SNS, and Kinesis
+1. SQS (Simple Queue Service)
+SQS is used to decouple applications and make them asynchronous. It helps manage sudden spikes in traffic by allowing applications to send and receive messages via a queue.
+
+Synchronous vs Asynchronous Communication
+Synchronous: Application 1 communicates directly with Application 2. Sudden spikes may overwhelm the system.
+Asynchronous: Application 1 sends messages to SQS, and Application 2 processes them. This decoupling ensures scalability and reliability.
+Key Features of SQS
+Unlimited Messages: No limit on the number of messages sent or stored.
+Message Lifespan: Messages last 4-14 days.
+Low Latency: <10 ms for both sending and receiving.
+Message Size: Up to 256 KB.
+Producers and Consumers
+Producer: Sends messages to SQS using an SDK. Messages persist until processed and deleted.
+Consumer: Processes messages from SQS. It can run on EC2, Lambda, or on-premises. Once processed, the consumer deletes the message using the DeleteMessage API.
+Autoscaling with SQS
+SQS publishes a CloudWatch metric called ApproximateNumberOfMessages.
+Set up a CloudWatch alarm to trigger autoscaling of EC2 instances when the queue length exceeds a threshold.
+Security
+Encryption in Flight: Messages are secured using HTTPS.
+At Rest Encryption: Messages are encrypted with KMS keys.
+Access Control: IAM policies and SQS policies allow fine-grained permissions and cross-account access.
+SQS Types
+Standard Queue:
+
+High throughput, but messages may be delivered out of order or duplicated.
+Visibility Timeout: Prevents duplicate processing; can be adjusted using ChangeMessageVisibility.
+FIFO Queue:
+
+Guarantees messages are delivered in order and only once.
+Names must end with .fifo.
+2. SNS (Simple Notification Service)
+SNS is a publish-subscribe (pub/sub) messaging service where:
+
+Publishers: Send messages to an SNS topic.
+Subscribers: Receive messages from the topic (e.g., SQS, Lambda, HTTP endpoints, or email/SMS notifications).
+Key Features of SNS
+Fan-out Pattern: Publish a single message to an SNS topic and distribute it to multiple SQS queues or other subscribers.
+Message Filtering: Use JSON policies to route messages to specific subscribers based on attributes (e.g., state: placed goes to OrderQueue, state: cancelled goes to CancelledQueue).
+SNS Use Cases
+Integrations: Works with services like CloudWatch, Auto Scaling, and Kinesis Data Firehose.
+Direct Mobile Publishing: Sends notifications via Google (FCM) or Apple (APNS).
+Security
+Encryption in Flight: Uses HTTPS by default.
+At Rest Encryption: Supports KMS for encryption.
+Access Control: IAM policies and SNS policies for cross-account or fine-grained access.
+FIFO in SNS
+Ensures message order.
+Subscribers are limited to SQS queues.
+3. Combined Patterns
+SNS + SQS Fan-out:
+
+A message is published to SNS and distributed to multiple SQS queues.
+Example: When an S3 object is created, an SNS topic sends notifications to SQS queues for further processing.
+SNS + Kinesis:
+
+SNS publishes data to Kinesis Data Firehose, which sends it to destinations like S3.
+Best Practices
+Use long polling in SQS to reduce unnecessary API calls.
+Design systems with FIFO queues when message order and deduplication are critical.
+Leverage message filtering in SNS for efficient routing.
